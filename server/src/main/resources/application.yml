@@ -1,0 +1,82 @@
+spring:
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+      enabled: true
+  jpa:
+    # 默认false，在日志里显示执行的sql语句
+    show-sql: true
+    database: mysql
+    # 指定为update，每次启动项目检测表结构有变化的时候会新增字段，表不存在时会新建，如果指定create，则每次启动项目都会清空数据并删除表，再新建
+    hibernate.ddl-auto: update
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        # 指定jpa的自动表生成策略，驼峰自动映射为下划线格式
+        #implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+
+  datasource:
+    username: root
+    password: embraiz2017
+    # 同样 低版本的MySql不需要指定时区
+    url: 'jdbc:mysql://107.150.121.34:3306/dodo50_erp?autoReconnect=true&failOverReadOnly=false&useSSL=false&characterEncoding=utf-8'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 3
+      maximum-pool-size: 10
+      max-lifetime: 30000
+
+
+  main:
+    allow-bean-definition-overriding: true #当遇到同样名字的时候，是否允许覆盖注册
+
+  servlet:
+    multipart:
+      max-file-size: 209715200
+      max-request-size: 209715200
+
+  redis:
+    # Redis数据库索引
+    database: 5
+    # Redis服务器地址
+    host: 103.218.240.197
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码
+    password: '!!Embraiz2020'
+    # 连接池配置
+    lettuce:
+      pool:
+        # 连接池最大连接数, 设 0 为没有限制
+        max-active: 8
+        # 最大等待连接中的数量, 设 0 为没有限制
+        max-idle: 8
+        # 最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
+        max-wait: -1ms
+        # 最小等待连接中的数量,设 0 为没有限制
+        min-idle: 0
+
+  mail:
+    host: smtp.mandrillapp.com
+    username: CHAPTER2
+    password: MDY_t1HPFKO4SksPQ1-GOg
+    properties.mail.smtp.auth: true
+    properties.mail.smtp.starttls.enable: true
+    default-encoding: utf-8
+    port: 587
+
+server:
+  port: 8000
+  tomcat:
+    uri-encoding: utf-8
+  servlet:
+    context-path: /server
+
+
+
+
+
+
