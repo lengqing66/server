@@ -14,6 +14,7 @@ import javax.persistence.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,22 +37,19 @@ class ServerApplicationTests {
 //        //ObjectUtil objUtil = new ObjectUtil();
 //        System.out.println(jsonObject.toJSONString(objUtil.checkConstraint("obj_user", result), true));
 
-        Query query = em.createNativeQuery("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'dodo50_erp' AND TABLE_NAME = 'obj'");
+        Query query = em.createNativeQuery("SELECT COLUMN_NAME,DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'dodo50_erp' AND TABLE_NAME = 'obj' order by column_key DESC");
         List list = query.getResultList();
-        Query type = em.createNativeQuery("SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'dodo50_erp' AND TABLE_NAME = 'obj'");
-        List typeList = ((Query) type).getResultList();
-        Query id = em.createNativeQuery("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'dodo50_erp' AND TABLE_NAME= 'obj' AND COLUMN_KEY = 'PRI'");
-        List idList = ((Query) id).getResultList();
         StringBuffer output = new StringBuffer();
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).equals(idList.get(0))) {
+            Object[] object = (Object[]) list.get(i);
+            if (i == 0) {
                 output.append("@Id\n");
-                output.append("@Column(name=" + list.get(i) + ")\n");
+                output.append("@Column(name=" + object[0] + ")\n");
                 output.append("@GeneratedValue(strategy = GenerationType.IDENTITY)\n");
-                output.append("private " + typeList.get(i) + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,list.get(i).toString()) + ";\n\n");
+                output.append("private " + object[1] + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
             } else {
-                output.append("@Column(name=" + list.get(i) + ")\n");
-                output.append("private " + typeList.get(i) + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,list.get(i).toString()) + ";\n\n");
+                output.append("@Column(name=" + object[0] + ")\n");
+                output.append("private " + object[1] + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
             }
         }
         System.out.println(output);
