@@ -1,29 +1,31 @@
 package com.embraiz.server;
 
-import com.embraiz.entity.server.ConfConstraint;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.embraiz.service.common.SQLUtil;
 import com.google.common.base.CaseFormat;
 import org.junit.jupiter.api.Test;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.boot.test.context.SpringBootTest;
 import com.embraiz.service.common.ObjectUtil;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class ServerApplicationTests {
     @PersistenceContext
     private EntityManager em;
+
+    @Resource
+    private SQLUtil sqlutil;
 
     @Autowired
     private ObjectUtil objUtil;
@@ -66,4 +68,15 @@ class ServerApplicationTests {
 
     }
     */
+    @Test
+    void SelectBySearchTest() {
+        String str = "[{'name':'objId','value':'1','type':'number'},{'name':'objTitle','value':'Admin','type':'text'},{'name':'createDate1','value':'2016-03-27','type':'date'},{'name':'createData2','value':'2016-03-29','type':'date'}]";
+//        String str = "[{'name':'I0','value':'2','type':'number'},{'name':'I1','value':'3','type':'number'}]";
+        JSONArray jsonArray =JSONArray.parseArray(str);
+//        for(int i=0;i<jsonArray.size();i++){
+//            JSONObject obj=(JSONObject)jsonArray.get(i);
+//            System.out.println(obj.getString("columnId"));
+//        }
+        sqlutil.SelectBySearch(jsonArray);
+    }
 }
