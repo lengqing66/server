@@ -18,10 +18,13 @@ public class SQLUtil {
     private EntityManager em;
 
     public void SelectBySearch(JSONArray jsonArray) {
-        boolean isNumber = false;
-        boolean isText = false;
-        boolean isDate = false;
-        for (int i = 0; i < jsonArray.size(); i++) {
+        boolean isNumber = false;//是否包括number，sql语句中用=
+        boolean isText = false;//是否包含text，sql语句中用like %...%
+        boolean isDate = false;//是否包含date，sql语句中用between...and...
+        boolean isFirstNum = true;//是否为第一个number，直接判断
+        boolean isFirstText = true;//是否为第一个text，在不存在number时进行判断
+        boolean isFirstDate = true;//是否为第一个date，在不存在number和text时进行判断
+        for (int i = 0; i < jsonArray.size(); i++) {//判断传入json数据包含哪些类型
             JSONObject obj = (JSONObject) jsonArray.get(i);
             if (obj.getString("type").equals("number")) {
                 isNumber = true;
@@ -31,45 +34,82 @@ public class SQLUtil {
                 isDate = true;
             }
         }
-        String sql = "";
+        String sql = "";//sql语句的判断条件
         if (isNumber == true) {
-//            for (int i = 0; i < jsonArray.size(); i++) {
-//                JSONObject obj = (JSONObject) jsonArray.get(i);
-//                if (obj.getString("type").equals("number")) {
-//                    System.out.println(obj.getString("type"));
-//                }
-//            }
-            sql += " where l2 = 0";
-            //select obj_id from obj where obj_parent_id=6;
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject obj = (JSONObject) jsonArray.get(i);
+                if (obj.getString("type").equals("number")) {
+                    if (isFirstNum == true) {
+                        sql += " where " + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, obj.getString("name")) + "=" + obj.getString("value");
+                        isFirstNum = false;
+                    } else {
+                        sql += " and " + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, obj.getString("name")) + "=" + obj.getString("value");
+                    }
+                }
+            }
         }
         if (isText == true) {
-            if(isNumber == false) {
-                sql += " where obj_desc like '%Admin%'";
-            }else {
-                sql += " and obj_desc like '%Admin%'";
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject obj = (JSONObject) jsonArray.get(i);
+                if (obj.getString("type").equals("text")) {
+                    if (isNumber == false) {
+                        if (isFirstText == true) {
+                            sql += " where " + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, obj.getString("name")) + " like '%" + obj.getString("value") + "%'";
+                            isFirstText = false;
+                        } else {
+                            sql += " and " + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, obj.getString("name")) + " like '%" + obj.getString("value") + "%'";
+                        }
+                    } else {
+                        sql += " and " + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, obj.getString("name")) + " like '%" + obj.getString("value") + "%'";
+                    }
+                }
             }
-            //select obj_id from obj where obj_title like '%user%';
         }
         if (isDate == true) {
-            if(isNumber == false&&isText==false) {
-                sql += " where create_date between '2016-03-28 16:13:09' and '2016-03-28 16:13:11'";
-            }else {
-                sql += " and create_date between '2016-03-28 16:13:09' and '2016-03-28 16:13:11'";
+            String Date = null;
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject obj = (JSONObject) jsonArray.get(i);
+                if (obj.getString("type").equals("date")) {
+                    if (isNumber == false && isText == false) {
+                        if (isFirstDate == true) {
+                            if (Date == null) {
+                                sql += " where " + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, obj.getString("name")) + " between '" + obj.getString("value") + "'";
+                                Date = obj.getString("name");
+                            } else if (Date.equals(obj.getString("name"))) {
+                                sql += " and '" + obj.getString("value") + "'";
+                                Date = null;
+                                isFirstDate = false;
+                            }
+                        } else {
+                            if (Date == null) {
+                                sql += " and " + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, obj.getString("name")) + " between '" + obj.getString("value") + "'";
+                                Date = obj.getString("name");
+                            } else if (Date.equals(obj.getString("name"))) {
+                                sql += " and '" + obj.getString("value") + "'";
+                                Date = null;
+                            }
+                        }
+                    } else {
+                        if (Date == null) {
+                            sql += " and " + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, obj.getString("name")) + " between '" + obj.getString("value") + "'";
+                            Date = obj.getString("name");
+                        } else if (Date.equals(obj.getString("name"))) {
+                            sql += " and '" + obj.getString("value") + "'";
+                            Date = null;
+                        }
+                    }
+                }
             }
-            //select obj_id from obj where create_date between '2016-03-29' and '2016-03-30';
         }
-        System.out.println(sql);
-//        Query query = em.createNativeQuery("select * from "+a+" where "+b+"="+c);
-        Query query = em.createNativeQuery("select * from obj"+sql);
+        Query query = em.createNativeQuery("select * from obj" + sql);
         List list = query.getResultList();
         for (int i = 0; i < list.size(); i++) {
             Object[] object = (Object[]) list.get(i);
-            System.out.println(i+" : "+list.get(i));
-            for(int j=0;j<object.length;j++){
-                System.out.println(j+" : "+object[j]);
+            System.out.println(i + " : " + list.get(i));
+            for (int j = 0; j < object.length; j++) {
+                System.out.println(j + " : " + object[j]);
             }
         }
-
     }
 
 }

@@ -70,13 +70,10 @@ class ServerApplicationTests {
     */
     @Test
     void SelectBySearchTest() {
-        String str = "[{'name':'objId','value':'1','type':'number'},{'name':'objTitle','value':'Admin','type':'text'},{'name':'createDate1','value':'2016-03-27','type':'date'},{'name':'createData2','value':'2016-03-29','type':'date'}]";
-//        String str = "[{'name':'I0','value':'2','type':'number'},{'name':'I1','value':'3','type':'number'}]";
+//        String str = "[{'name':'objId','value':'1','type':'number'},{'name':'objTitle','value':'Admin','type':'text'},{'name':'createDate','value':'2016-03-27','type':'date'},{'name':'createDate','value':'2016-03-29','type':'date'}]";
+//        String str = "[{'name':'l0','value':'2','type':'number'},{'name':'objTitle','value':'Admin','type':'text'},{'name':'createDate','value':'2016-03-27','type':'date'},{'name':'createDate','value':'2016-03-30','type':'date'},{'name':'l1','value':'3','type':'number'},{'name':'status','value':'1','type':'text'},{'name':'l2','value':'3','type':'date'},{'name':'l2','value':'6','type':'date'}]";
+        String str = "[{'name':'createDate','value':'2016-03-27','type':'date'},{'name':'createDate','value':'2016-03-29','type':'date'},{'name':'l2','value':'3','type':'date'},{'name':'l2','value':'6','type':'date'}]";
         JSONArray jsonArray =JSONArray.parseArray(str);
-//        for(int i=0;i<jsonArray.size();i++){
-//            JSONObject obj=(JSONObject)jsonArray.get(i);
-//            System.out.println(obj.getString("columnId"));
-//        }
         sqlutil.SelectBySearch(jsonArray);
     }
 }
