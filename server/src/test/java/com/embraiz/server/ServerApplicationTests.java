@@ -32,30 +32,14 @@ class ServerApplicationTests {
 
     @Test
     void contextLoads() {
-//        String result = "{'userRoleId':1,'userId':1,'roleId':1,'roleName':'superAdmin','userName':'admin','nickName':'Administrator','email':'adminembraiz.com','mobilePhone':null,'directPhone':null,'address1':null,'address2':null,'title':null,'firstName':null,'lastName':null,'position':null,'isFirstLogin':0,'status':1,'isRemove':0,'activeDate':null}";
-//        JSONObject jsonObject = JSONObject.parseObject(result);
-//        System.out.println(jsonObject.getString("roleName"));
-//
-//        //ObjectUtil objUtil = new ObjectUtil();
-//        System.out.println(jsonObject.toJSONString(objUtil.checkConstraint("obj_user", result), true));
+        String result = "{'userRoleId':1,'userId':1,'roleId':1,'roleName':'superAdmin','userName':'admin','nickName':'Administrator','email':'adminembraiz.com','mobilePhone':null,'directPhone':null,'address1':null,'address2':null,'title':null,'firstName':null,'lastName':null,'position':null,'isFirstLogin':0,'status':1,'isRemove':0,'activeDate':null}";
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        System.out.println(jsonObject.getString("roleName"));
 
-        Query query = em.createNativeQuery("SELECT COLUMN_NAME,DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'dodo50_erp' AND TABLE_NAME = 'obj' order by column_key DESC");
-        List list = query.getResultList();
-        StringBuffer output = new StringBuffer();
-        for (int i = 0; i < list.size(); i++) {
-            Object[] object = (Object[]) list.get(i);
-            if (i == 0) {
-                output.append("@Id\n");
-                output.append("@Column(name=" + object[0] + ")\n");
-                output.append("@GeneratedValue(strategy = GenerationType.IDENTITY)\n");
-                output.append("private " + object[1] + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
-            } else {
-                output.append("@Column(name=" + object[0] + ")\n");
-                output.append("private " + object[1] + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
-            }
-        }
-        System.out.println(output);
+        //ObjectUtil objUtil = new ObjectUtil();
+        System.out.println(jsonObject.toJSONString(objUtil.checkConstraint("obj_user", result), true));
     }
+
     /*
     @Test
     void generateEntity(){
@@ -68,6 +52,41 @@ class ServerApplicationTests {
 
     }
     */
+
+    @Test
+    void autoCreate() {
+//        String tableName="obj";
+        String tableName="vUserRole";
+        Query query = em.createNativeQuery("SELECT COLUMN_NAME,DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'dodo50_erp' AND TABLE_NAME = '"+CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, tableName)+"' order by column_key DESC");
+        List list = query.getResultList();
+        StringBuffer output = new StringBuffer();
+        for (int i = 0; i < list.size(); i++) {
+            Object[] object = (Object[]) list.get(i);
+            if (i == 0) {
+                output.append("@Id\n");
+                output.append("@Column(name=\"" + object[0] + "\")\n");
+                output.append("@GeneratedValue(strategy = GenerationType.IDENTITY)\n");
+                if(object[1].equals("int")||object[1].equals("tinyint")||object[1].equals("smallint")) {
+                    output.append("private Integer " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
+                }else if(object[1].equals("varchar")){
+                    output.append("private String " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
+                }else if(object[1].equals("timestamp")||object[1].equals("datetime")){
+                    output.append("private Date " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
+                }
+            } else {
+                output.append("@Column(name=\"" + object[0] + "\")\n");
+                if(object[1].equals("int")||object[1].equals("tinyint")||object[1].equals("smallint")) {
+                    output.append("private Integer " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
+                }else if(object[1].equals("varchar")){
+                    output.append("private String " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
+                }else if(object[1].equals("timestamp")||object[1].equals("datetime")){
+                    output.append("private Date " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, object[0].toString()) + ";\n\n");
+                }
+            }
+        }
+        System.out.println(output);
+    }
+
     @Test
     void SelectBySearchTest() {
 //        String str = "[{'name':'objId','value':'1','type':'number'},{'name':'objTitle','value':'Admin','type':'text'},{'name':'createDate','value':'2016-03-27','type':'date'},{'name':'createDate','value':'2016-03-29','type':'date'}]";
